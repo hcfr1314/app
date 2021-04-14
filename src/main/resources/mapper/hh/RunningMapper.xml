@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.RunningMapper">
+
+    <sql id="ActivePowerAndIrradiance">
+        t1.ACTIVE_POWER activePower,
+        t2.IRRADIANCE irradiance,
+        t1.CREATE_TIME createTime
+    </sql>
+
+    <sql id="IrradiationGeneration">
+        t1.CURRENT_IRRADIATION currentGeneration,
+        t2.CURRENT_GENERATION currentIrradiation,
+        t1.CREATE_TIME createTime
+    </sql>
+
+    <sql id="common">
+        PLANT_CODE plantCode,
+        PLANT_NAME plantName,
+        PLANT_TYPE plantType
+    </sql>
+
+
+    <sql id="point">
+       ORG_ID orgId,
+       DESCRIPTION description,
+       PLANT_CODE plantCode,
+       ORG_TYPE orgType
+    </sql>
+
+    <sql id="ActPowerAndIrr">
+     INDEX_NAME indexName,
+     INDEX_VALUE indexValue,
+     CREATE_TIME createTime
+    </sql>
+
+    <!--获得有功功率和辐照度-->
+    <select id="queryActivePowerAndIrradiance" resultType="com.hhgs.app.model.DO.ActivePowerAndIrradiance">
+        select
+        <include refid="ActivePowerAndIrradiance"></include>
+        from
+        ( select ACTIVE_POWER, CREATE_TIME from WEBAPP_REL_EQUIPMENT_OPERATION where PLANT_CODE = #{plantCode}
+        and CREATE_TIME &gt;= #{startTime} and CREATE_TIME &lt;= #{endTime}) t1,
+        (select IRRADIANCE,CREATE_TIME from WEBAPP_SOLAR_ENERGY_RESOURCE where PLANT_CODE = #{plantCode}
+        and CREATE_TIME &gt;= #{startTime} and CREATE_TIME &lt;= #{endTime}) t2
+        where
+        "TO_CHAR"(T1.CREATE_TIME,'yyyy-mm-dd') = "TO_CHAR"(T2.CREATE_TIME,'yyyy-mm-dd') order By t1.CREATE_TIME asc
+    </select>
+
+    <!--获得辐照量和发电量-->
+    <select id="queryIrradiationGeneration" resultType="com.hhgs.app.model.DO.IrradiationGeneration">
+        select
+        <include refid="IrradiationGeneration"></include>
+        from
+        ( select CURRENT_IRRADIATION, CREATE_TIME from WEBAPP_SOLAR_ENERGY_RESOURCE where PLANT_CODE = #{plantCode}
+        and CREATE_TIME &gt;= #{startTime} and CREATE_TIME &lt;= #{endTime}) t1,
+        (select CURRENT_GENERATION,CREATE_TIME from WEBAPP_ELECTRICITY_INDEX where PLANT_CODE = #{plantCode}
+        and CREATE_TIME &gt;= #{startTime} and CREATE_TIME &lt;= #{endTime}) t2
+        where
+        "TO_CHAR"(T1.CREATE_TIME,'yyyy-mm-dd') = "TO_CHAR"(T2.CREATE_TIME,'yyyy-mm-dd') order By t1.CREATE_TIME asc
+    </select>
+
+
+    <!--查询所有场站信息-->
+    <select id="queryAllPlantInfo" resultType="com.hhgs.app.model.DO.PlantInfo">
+        select
+         <include refid="common"></include>
+        FROM
+            DEVICEMODEL_PLANT_INFO
+        WHERE PLANT_TYPE = 1
+    </select>
+
+    <!--查询实时测点的信息-->
+    <select id="queryPointInfo" parameterType="java.lang.Integer" resultType="com.hhgs.app.model.DO.WebappPoint">
+        select
+          <include refid="point"></include>
+        from WEBAPP_POINTS
+        where PLANT_CODE = #{plantCode}
+    </select>
+
+    <!--设备运行指标数据入库-->
+    <insert id="saveEquipmentRunningIndex" parameterType="com.hhgs.app.model.DO.EquipmentRunning">
+        insert into WEBAPP_EQUIPMENT_RUNNING (INDEX_NAME,INDEX_VALUE,CREATE_TIME,PLANT_CODE)
+        values (#{equipmentRunning.indexName},#{equipmentRunning.indexValue},#{equipmentRunning.createTime},#{equipmentRunning.plantCode})
+    </insert>
+
+    <!--查询有功功率和辐照度-->
+    <select id="queryActPowerAndIrr" resultType="com.hhgs.app.model.DO.EquipmentRunning">
+        select <include refid="ActPowerAndIrr"></include> from WEBAPP_EQUIPMENT_RUNNING
+        where CREATE_TIME  &gt;= #{startTime} and CREATE_TIME &lt;= #{endTime} and PLANT_CODE = #{plantCode} order By CREATE_TIME asc
+    </select>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.EquiRunningAnalysicMapper">
+
+    <select id="queryByPlantCodeAndCreateDate" resultType="com.hhgs.app.model.DO.EquiRunningAnalysic">
+        SELECT
+         DAILY_MAXIMUM_LOAD maxLoad,
+         MAXIMUM_LOAD_TIME maxLoadTime,
+         DAILY_MAXIMUM_LOAD_RATE maxLoadRate,
+         DAILY_OPERATION_TIME runingHourOfDay,
+         CREATE_TIME createDate,
+         ID id,
+         PLANT_CODE plantCode,
+         ACTIVE_POWER activePower,
+         DAILY_OPERATION_TIME_MONTH runingHourOfMonth,
+         DAILY_OPERATION_TIME_YEAR runingHourOfYear
+        FROM
+          WEBAPP_REL_EQUIPMENT_OPERATION
+        WHERE
+          PLANT_CODE=#{plantCode} AND to_char(CREATE_TIME,'YYYY-MM-DD') = #{date}
+    </select>
+
+    <insert id="insert" parameterType="com.hhgs.app.model.DO.EquiRunningAnalysic">
+        INSERT INTO WEBAPP_REL_EQUIPMENT_OPERATION
+           (DAILY_MAXIMUM_LOAD, MAXIMUM_LOAD_TIME, DAILY_MAXIMUM_LOAD_RATE, DAILY_OPERATION_TIME, CREATE_TIME, PLANT_CODE, ACTIVE_POWER,DAILY_OPERATION_TIME_MONTH,DAILY_OPERATION_TIME_YEAR)
+        VALUES (#{maxLoad}, #{maxLoadTime}, #{maxLoadRate}, #{runingHourOfDay}, #{createDate}, #{hourOfYear},#{plantCode}, #{activePower},#{runingHourOfMonth},#{runingHourOfYear})
+    </insert>
+
+    <update id="update" parameterType="com.hhgs.app.model.DO.EquiRunningAnalysic">
+       UPDATE WEBAPP_REL_EQUIPMENT_OPERATION
+       SET DAILY_MAXIMUM_LOAD=#{maxLoad}, MAXIMUM_LOAD_TIME=#{maxLoadTime}, DAILY_MAXIMUM_LOAD_RATE=#{maxLoadRate}, DAILY_OPERATION_TIME=#{runingHourOfDay}, CREATE_TIME=#{createDate}, PLANT_CODE=#{plantCode}, ACTIVE_POWER=#{activePower},DAILY_OPERATION_TIME_MONTH=#{runingHourOfMonth},DAILY_OPERATION_TIME_YEAR=#{runingHourOfYear}
+       WHERE ID=#{id}
+    </update>
+
+</mapper>

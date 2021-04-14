@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.UserMapper">
+
+    <resultMap id="common" type="com.hhgs.app.model.DO.user.User">
+        <id column="ID" property="id"/>
+        <result property="username" column="USERNAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="accountNonExpired" column="ACCOUNT_NON_EXPIRED"/>
+        <result property="accountNonLocked" column="ACCOUNT_NON_LOCKED"/>
+        <result property="credentialsNonExpired" column="CREDENTIALS_NON_EXPIRED"/>
+        <result property="enabled" column="ENABLE"/>
+        <collection property="groups" ofType="com.hhgs.app.model.DO.user.Group">
+            <id property="groupid" column="GROUP_ID"/>
+            <result property="groupName" column="GROUP_NAME"/>
+        </collection>
+        <collection property="roles" ofType="com.hhgs.app.model.DO.user.Role">
+            <id property="id" column="roleId"/>
+            <result property="name" column="NAME"/>
+            <result property="enName" column="EN_NAME"/>
+            <collection property="permissions" ofType="com.hhgs.app.model.DO.user.Permission">
+                <id property="id" column="pid"/>
+                <result property="url" column="URL"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <resultMap id="queryUserByUsernameMap" type="com.hhgs.app.model.DO.user.User">
+        <id column="ID" property="id"/>
+        <result property="username" column="USERNAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="accountNonExpired" column="ACCOUNT_NON_EXPIRED"/>
+        <result property="accountNonLocked" column="ACCOUNT_NON_LOCKED"/>
+        <result property="credentialsNonExpired" column="CREDENTIALS_NON_EXPIRED"/>
+        <result property="enabled" column="ENABLE"/>
+        <collection property="roles" ofType="com.hhgs.app.model.DO.user.Role">
+            <id property="id" column="roleId"/>
+            <result property="name" column="NAME"/>
+            <result property="enName" column="EN_NAME"/>
+        </collection>
+    </resultMap>
+
+    <sql id="userRole">
+        ID id,
+        NAME name,
+        EN_NAME enName
+    </sql>
+
+
+    <select id="loadUserByUsername" parameterType="string" resultMap="common">
+            SELECT
+	            U.ID ID,U.USERNAME USERNAME,U.PASSWORD PASSWORD,U.ACCOUNT_NON_EXPIRED ACCOUNT_NON_EXPIRED,U.CREDENTIALS_NON_EXPIRED CREDENTIALS_NON_EXPIRED,U.ENABLE ENABLE,U.ACCOUNT_NON_LOCKED ACCOUNT_NON_LOCKED,
+	            R.ID roleId,R.NAME NAME,R.EN_NAME EN_NAME,
+	            P.ID pid,P.URL URL,
+	            G.GROUP_ID GROUP_ID,G.GROUP_NAME GROUP_NAME
+            FROM
+                (
+                    SELECT
+                        *
+                    FROM
+                        WEBAPP_USER
+                    WHERE
+                        USERNAME = #{username}
+                ) U
+            LEFT JOIN WEBAPP_USER_ROLE UR ON U.ID = UR.USER_ID
+            LEFT JOIN WEBAPP_ROLE R ON UR.ROLE_ID = R.ID
+            LEFT JOIN WEBAPP_ROLE_PERMISSION RP ON R.ID = RP.ROLE_ID
+            LEFT JOIN WEBAPP_PERMISSION P ON RP.PERMISSION_ID = P.ID
+            LEFT JOIN WEBAPP_GROUP_USER GU ON GU.USER_ID=U.ID
+            LEFT JOIN WEBAPP_GROUP G ON G.GROUP_ID=GU.GROUP_ID
+    </select>
+
+
+    <select id="queryUserByUsername" parameterType="string" resultMap="queryUserByUsernameMap">
+            SELECT
+	            U.ID ID,U.USERNAME USERNAME,U.PASSWORD PASSWORD,U.ACCOUNT_NON_EXPIRED ACCOUNT_NON_EXPIRED,U.CREDENTIALS_NON_EXPIRED CREDENTIALS_NON_EXPIRED,U.ENABLE ENABLE,U.ACCOUNT_NON_LOCKED ACCOUNT_NON_LOCKED,
+	            R.ID roleId,R.NAME NAME,R.EN_NAME EN_NAME
+            FROM
+                (
+                    SELECT
+                        *
+                    FROM
+                        WEBAPP_USER
+                    WHERE
+                        USERNAME = #{username}
+                ) U
+            LEFT JOIN WEBAPP_USER_ROLE UR ON U.ID = UR.USER_ID
+            LEFT JOIN WEBAPP_ROLE R ON UR.ROLE_ID = R.ID
+    </select>
+
+    <insert id="saveUser" parameterType="com.hhgs.app.model.DO.user.User">
+        insert into WEBAPP_USER (USERNAME,PASSWORD,NAME_OF_PERSON,PHONE_NUMBER,ACCOUNT_NON_EXPIRED,ACCOUNT_NON_LOCKED,CREDENTIALS_NON_EXPIRED,ENABLE)
+        values (#{user.username},#{user.password}, #{user.nameOfPerson},#{user.phoneNumber},1,1,1,1)
+    </insert>
+
+    <update id="editUser" parameterType="com.hhgs.app.model.DO.user.User">
+        update WEBAPP_USER set
+        <trim suffixOverrides=",">
+            <if test="user.username != null and user.username != ''">
+                USERNAME = #{user.username},
+            </if>
+
+            <if test="user.password != null and user.password != ''">
+                PASSWORD = #{user.password},
+            </if>
+
+            <if test="user.nameOfPerson != null and user.nameOfPerson != ''">
+                NAME_OF_PERSON = #{user.nameOfPerson},
+            </if>
+
+            <if test="user.phoneNumber != null and user.phoneNumber != ''">
+                PHONE_NUMBER = #{user.phoneNumber}
+            </if>
+
+        </trim>
+        where ID = #{user.id}
+    </update>
+
+    <select id="findAllUser" resultType="com.hhgs.app.model.DO.user.User">
+        select * from WEBAPP_USER
+    </select>
+
+
+    <select id="findOtherRoles" parameterType="java.lang.Integer" resultType="com.hhgs.app.model.DO.user.Role">
+        select <include refid="userRole"></include> from WEBAPP_ROLE where ID not in (select ROLE_ID from
+        WEBAPP_USER_ROLE where USER_ID = #{userId})
+    </select>
+
+    <select id="addRolesToUser" parameterType="java.lang.Integer">
+        insert into WEBAPP_USER_ROLE (USER_ID,ROLE_ID) values (#{userId},#{roleId})
+    </select>
+
+    <delete id="deleteRoleByRoleId" parameterType="java.lang.Integer">
+        delete from WEBAPP_USER_ROLE where USER_ID = #{userId} and ROLE_ID = #{roleId}
+    </delete>
+
+    <delete id="deleteUserByUserId" parameterType="java.lang.Integer">
+        delete from WEBAPP_USER where ID = #{userId}
+    </delete>
+
+    <delete id="deleteUserRoleByUserId" parameterType="java.lang.Integer">
+        delete from WEBAPP_USER_ROLE where USER_ID = #{userId}
+    </delete>
+</mapper>

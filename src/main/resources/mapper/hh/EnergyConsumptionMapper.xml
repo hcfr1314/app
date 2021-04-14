@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.EnergyConsumptionMapper">
+
+    <sql id="EnergyConsumption">
+        ID as id,
+        CURRENT_EXTERNAL_POWER_3590 as out3590UsePwOfDay,
+        MONTH_EXTERNAL_POWER_3590 as  out3590UsePwOfYear,
+        YEAR_EXTERNAL_POWER_3590 as out3590UsePwOfYear,
+        CURRENT_STATION_USE_85B_3585 as in85B3585usePwOfDay,
+        MONTH_STATION_USE_85B_3585 as in85B3585usePwOfMonth,
+        YEAR_STATION_USE_85B_3585 as in85B3585usePwOfYear,
+        CURRENT_STATION_USE_95B_3595 as in95B3595usePwOfDay,
+        MONTH_STATION_USE_95B_3595 as in95B3595usePwOfMonth,
+        YEAR_STATION_USE_95B_3595 as in95B3595usePwOfYear,
+        POWER_PURCHASE as purchasePw,
+        COM_PLANT_POWER_CON as factoryPw,
+        COM_PLANT_POWER_CON_MONTH as factoryPwOfMonth,
+        COM_PLANT_POWER_CON_YEAR as factoryPwOfYear,
+        COM_PLANT_POWER_CON_RATE as factoryRateOfDay,
+        COM_PLANT_PW_CON_RATE_MONTH as factoryRateOfMonth,
+        COM_PLANT_PW_CON_RATE_YEAR as factoryRateOfYear,
+        PLANT_CODE as plantCode,
+        CREATE_TIME as createDate
+    </sql>
+
+    <select id="queryDataByTimeAndPlantCode" resultType="com.hhgs.app.model.DO.EnergyComsume">
+        select <include refid="EnergyConsumption"></include>
+        from WEBAPP_ENERGY_CONSUMPTION where TO_CHAR (CREATE_TIME, 'YYYY-MM') = #{date}  and PLANT_CODE = #{plantCode}
+    </select>
+
+    <insert id="addData" parameterType="com.hhgs.app.model.DO.EnergyComsume">
+        insert into WEBAPP_ENERGY_CONSUMPTION
+        (CURRENT_EXTERNAL_POWER_3590,MONTH_EXTERNAL_POWER_3590,YEAR_EXTERNAL_POWER_3590,CURRENT_STATION_USE_85B_3585,MONTH_STATION_USE_85B_3585,
+        YEAR_STATION_USE_85B_3585,CURRENT_STATION_USE_95B_3595,MONTH_STATION_USE_95B_3595,YEAR_STATION_USE_95B_3595,POWER_PURCHASE,COM_PLANT_POWER_CON,
+        COM_PLANT_POWER_CON_RATE,PLANT_CODE,CREATE_TIME,COM_PLANT_POWER_CON_MONTH,COM_PLANT_POWER_CON_YEAR,COM_PLANT_PW_CON_RATE_MONTH,COM_PLANT_PW_CON_RATE_YEAR)
+        values (#{energyComsume.out3590UsePwOfDay},#{energyComsume.out3590UsePwOfYear},#{energyComsume.out3590UsePwOfYear},#{energyComsume.in85B3585usePwOfDay},
+        #{energyComsume.in85B3585usePwOfMonth},#{energyComsume.in85B3585usePwOfYear},#{energyComsume.in95B3595usePwOfDay},#{energyComsume.in95B3595usePwOfMonth},
+        #{energyComsume.in95B3595usePwOfYear},#{energyComsume.purchasePw},#{energyComsume.factoryPw},#{energyComsume.factoryRateOfDay},#{energyComsume.plantCode},
+        #{energyComsume.createDate},#{energyComsume.factoryPwOfMonth},#{energyComsume.factoryPwOfYear},#{energyComsume.factoryRateOfMonth},#{energyComsume.factoryRateOfYear})
+    </insert>
+
+    <update id="updateData" parameterType="com.hhgs.app.model.DO.EnergyComsume">
+        update WEBAPP_ENERGY_CONSUMPTION set
+        CURRENT_EXTERNAL_POWER_3590 = #{energyComsume.out3590UsePwOfDay},
+        MONTH_EXTERNAL_POWER_3590 = #{energyComsume.out3590UsePwOfYear},
+        YEAR_EXTERNAL_POWER_3590 = #{energyComsume.out3590UsePwOfYear},
+        CURRENT_STATION_USE_85B_3585 = #{energyComsume.in85B3585usePwOfDay},
+        MONTH_STATION_USE_85B_3585 = #{energyComsume.in85B3585usePwOfMonth},
+        YEAR_STATION_USE_85B_3585 = #{energyComsume.in85B3585usePwOfYear},
+        CURRENT_STATION_USE_95B_3595 = #{energyComsume.in95B3595usePwOfDay},
+        MONTH_STATION_USE_95B_3595 = #{energyComsume.in95B3595usePwOfMonth},
+        YEAR_STATION_USE_95B_3595 = #{energyComsume.in95B3595usePwOfYear},
+        POWER_PURCHASE = #{energyComsume.purchasePw},
+        COM_PLANT_POWER_CON = #{energyComsume.factoryPw},
+        COM_PLANT_POWER_CON_RATE = #{energyComsume.factoryRateOfDay},
+        COM_PLANT_PW_CON_RATE_MONTH =#{ energyComsume.factoryRateOfMonth},
+        COM_PLANT_PW_CON_RATE_YEAR =#{energyComsume.factoryRateOfYear},
+        PLANT_CODE = #{energyComsume.plantCode},
+        CREATE_TIME = #{energyComsume.createDate},
+        COM_PLANT_POWER_CON_MONTH = #{factoryPwOfMonth},
+        COM_PLANT_POWER_CON_YEAR = #{factoryPwOfYear}
+        where  ID = #{energyComsume.id}
+    </update>
+
+</mapper>

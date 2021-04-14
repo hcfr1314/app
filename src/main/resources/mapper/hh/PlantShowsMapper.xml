@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.PlantShowsMapper">
+
+    <sql id="common">
+        ID AS id,
+        PLANT_NAME AS plantName,
+        PLANT_TYPE AS plantType,
+        IS_HIERARCHY AS isHierarchy,
+        PLANT_CODE AS plantCode
+    </sql>
+
+
+    <select id="getAllPlantName" resultType="com.hhgs.app.model.DO.PlantTable">
+        select <include refid="common"></include> from DEVICEMODEL_PLANT_TABLE ORDER BY ID
+    </select>
+
+
+</mapper>

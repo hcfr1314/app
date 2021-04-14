@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.PermissionMapper">
+
+    <resultMap id="common" type="com.hhgs.app.model.DO.user.Permission">
+        <id property="id" column="pid"/>
+        <result property="url" column="URL"/>
+    </resultMap>
+
+
+    <insert id="savePermission" parameterType="com.hhgs.app.model.DO.user.Permission">
+        insert into WEBAPP_PERMISSION (URL)
+        values (#{permission.url})
+    </insert>
+
+    <select id="findAllPermission" resultMap="common">
+        select * from WEBAPP_PERMISSION order by ID
+    </select>
+
+    <select id="deleteByPermissionId" parameterType="java.lang.Integer">
+       delete from WEBAPP_PERMISSION where ID = #{permissionId}
+    </select>
+
+    <select id="editPermission">
+        update WEBAPP_PERMISSION set URL = #{permission.url} where ID = #{permission.id}
+    </select>
+</mapper>

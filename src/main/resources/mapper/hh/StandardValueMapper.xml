@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.StandardValueMapper">
+    <update id="updateStandardValue">
+       update WEBAPP_STANDARD_VALUE set COSUME_ELE_VALUE=#{val},AVAILABILITY_VALUE=#{val2},UPDATE_TIME=SYSDATE,NAME=#{name} where PLANT_CODE=#{plantCode}
+    </update>
+
+    <select id="queryByPlantCodeList" parameterType="list" resultType="com.hhgs.app.model.DO.StandardValue">
+      SELECT
+        ID id,
+        COSUME_ELE_VALUE comsumeEleValue,
+        PLANT_CODE plantCode,
+        AVAILABILITY_VALUE availablityValue,
+        UPDATE_TIME updateTime
+     FROM
+        WEBAPP_STANDARD_VALUE
+    WHERE PLANT_CODE IN
+    <foreach collection="codeList" item="code" open="(" close=")" separator=",">
+        #{code}
+    </foreach>
+    </select>
+</mapper>

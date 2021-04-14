@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.OperationIndexMapper">
+
+    <sql id="electricityIndex">
+       CURRENT_GENERATION as powerOfDay,
+       MONTH_ACC_GENERATION as powerOfMonth,
+       YEAR_ACC_GENERATION as powerOfYear
+    </sql>
+
+    <select id="queryIndexValueByPlantCode" parameterType="java.lang.Integer"
+            resultType="com.hhgs.app.model.DO.PowerIndicator">
+        select <include refid="electricityIndex"></include> from WEBAPP_ELECTRICITY_INDEX where PLANT_CODE =
+        #{plantCode} and to_char(CREATE_TIME,'YYYY-MM-DD') = to_char(SYSDATE,'YYYY-MM-DD') ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="queryIndexValueEveryPlant" resultType="com.hhgs.app.model.DO.PowerIndicator">
+        select <include refid="electricityIndex"></include> from WEBAPP_ELECTRICITY_INDEX where
+        to_char(CREATE_TIME,'YYYY-MM-DD') = to_char(SYSDATE,'YYYY-MM-DD') group by PLANT_CODE ORDER BY CREATE_TIME DESC
+    </select>
+
+    <!--查询当天所有数据-->
+    <select id="getData" resultType="com.hhgs.app.model.VO.OperationIndex">
+          SELECT
+            P.PLANT_CODE plantCode,
+            P.INSTALL_CAPACITY installedCapacity,
+            R.MEAN_TEMPERATURE averageTemperature,
+            R.AVG_WIND_SPEED avgWindSpeed,
+            E.CURRENT_GENERATION currentCeneration,
+            E.MONTH_ACC_GENERATION monthAccCeneration,
+            E.YEAR_ACC_GENERATION yearAccCeneration
+          FROM
+	        (
+	           SELECT
+             PLANT_CODE,
+             PLANT_NAME,
+             PLANT_TYPE,
+             INSTALL_CAPACITY
+           FROM
+            DEVICEMODEL_PLANT_INFO
+           WHERE PLANT_TYPE=#{plantType}
+            ) P
+          LEFT JOIN
+            (
+                SELECT
+                    *
+                FROM
+                    WEBAPP_SOLAR_ENERGY_RESOURCE
+                WHERE
+                    TO_CHAR (CREATE_TIME, 'YYYY-MM-DD') = TO_CHAR (SYSDATE-1, 'YYYY-MM-DD')
+            ) R
+          ON P.PLANT_CODE = R.PLANT_CODE
+          LEFT JOIN
+            (
+                SELECT
+                    *
+                FROM
+                    WEBAPP_ELECTRICITY_INDEX
+                WHERE
+                    TO_CHAR (CREATE_TIME, 'YYYY-MM-DD') = TO_CHAR (SYSDATE-1, 'YYYY-MM-DD')
+            ) E
+        ON P.PLANT_CODE = E.PLANT_CODE
+        WHERE P.PLANT_TYPE=#{plantType}
+    </select>
+
+    <select id="queryByPlantCodeAndCreateDate" resultType="com.hhgs.app.model.DO.SolarEnergy">
+        SELECT
+          CURRENT_IRRADIATION heOfDay,
+          MONTH_ACC_IRRADIATION heOfMonth,
+          YEAR_ACC_IRRADIATION heOfYear,
+          CURRENT_SUN_HOURS hourOfDay,
+          MONTH_ACC_SUN_HOURS hourOfMonth,
+          YEAR_ACC_SUN_HOURS hourOfYear,
+          AVG_WIND_SPEED avgWindSpeed,
+          MEAN_TEMPERATURE avgTemperature,
+          CREATE_TIME createDate,
+          ID id,
+          PLANT_CODE plantCode,
+          IRRADIANCE irradiance
+         FROM WEBAPP_SOLAR_ENERGY_RESOURCE
+         WHERE
+          PLANT_CODE=#{plantCode} AND to_char(CREATE_TIME,'YYYY-MM-DD') = to_char(date,'YYYY-MM-DD')
+    </select>
+
+
+
+
+</mapper>

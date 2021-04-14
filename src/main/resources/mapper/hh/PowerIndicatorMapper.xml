@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.PowerIndicatorMapper">
+     <select id="queryByCreateTime" resultType="com.hhgs.app.model.DO.PowerIndicator">
+            SELECT
+                CURRENT_GENERATION powerOfDay,
+                MONTH_ACC_GENERATION powerOfMonth,
+                PLANT_CODE plantCode
+            FROM
+                WEBAPP_ELECTRICITY_INDEX
+            WHERE
+                TO_CHAR (CREATE_TIME, 'YYYY-MM-DD') = #{date} and PLANT_CODE=#{plantCode}
+     </select>
+
+    <select id="queryMPWByCreateTime" resultType="com.hhgs.app.model.DO.PowerIndicator">
+            SELECT
+                CURRENT_GENERATION powerOfDay,
+
+                CREATE_TIME createDate
+            FROM
+                WEBAPP_ELECTRICITY_INDEX
+            WHERE
+                TO_CHAR (CREATE_TIME, 'YYYY-MM') = #{date} and PLANT_CODE=#{plantCode}
+            ORDER BY CREATE_TIME ASC
+     </select>
+
+    <select id="queryByPlantCodeAndCreateDate" resultType="com.hhgs.app.model.DO.PowerIndicator">
+        SELECT
+         CURRENT_GENERATION powerOfDay,
+         MONTH_ACC_GENERATION powerOfMonth,
+         YEAR_ACC_GENERATION powerOfYear,
+         CURRENT_ON_GRID_ENERGY internetPwOfDay,
+         MONTH_ACC_ON_GRID_ENERGY internetPwOfMonth,
+         YEAR_ACC_ON_GRID_ENERGY internetPwOfYear,
+         CURRENT_REVERSE_POWER backPwOfDay,
+         MONTH_ACC_REVERSE_POWER backPwOfMonth,
+         YEAR_ACC_REVERSE_POWER backPwOfYear,
+         CURRENT_LIGHT_LIMIT limitPwOfDay,
+         MONTH_ACC_LIGHT_LIMIT limitPwOfMonth,
+         YEAR_ACC_LIGHT_LIMIT limitPwOfYear,
+         POWER_GRID_LIGHT_RATE limitRate,
+         CURRENT_FAULT_LIGHT_REJ errorPwOfDay,
+         MONTH_ACC_FAULT_LIGHT_REJ errorPwOfMonth,
+         YEAR_ACC_FAULT_LIGHT_REJ errorPwOfYear,
+         FAILURE_REJECTION_RATE errorRate,
+         THEORETICAL_POWER_GEN theoryPower,
+         DAILY_UTIL_HOURS dayUserOfHour,
+         CREATE_TIME createDate,
+         PLANT_CODE plantCode,
+         ID id
+        FROM
+          WEBAPP_ELECTRICITY_INDEX
+        WHERE
+          PLANT_CODE=#{plantCode} AND to_char(CREATE_TIME,'YYYY-MM-DD') = #{date}
+    </select>
+
+    <insert id="insert" parameterType="com.hhgs.app.model.DO.PowerIndicator">
+        INSERT INTO WEBAPP_ELECTRICITY_INDEX
+           (CURRENT_GENERATION,MONTH_ACC_GENERATION,YEAR_ACC_GENERATION,CURRENT_ON_GRID_ENERGY,MONTH_ACC_ON_GRID_ENERGY,YEAR_ACC_ON_GRID_ENERGY,CURRENT_REVERSE_POWER,MONTH_ACC_REVERSE_POWER,YEAR_ACC_REVERSE_POWER,CURRENT_LIGHT_LIMIT,MONTH_ACC_LIGHT_LIMIT,YEAR_ACC_LIGHT_LIMIT,POWER_GRID_LIGHT_RATE,CURRENT_FAULT_LIGHT_REJ,MONTH_ACC_FAULT_LIGHT_REJ,YEAR_ACC_FAULT_LIGHT_REJ,FAILURE_REJECTION_RATE,THEORETICAL_POWER_GEN,DAILY_UTIL_HOURS,CREATE_TIME,PLANT_CODE)
+        VALUES (#{powerOfDay}, #{powerOfMonth}, #{powerOfYear}, #{internetPwOfDay}, #{internetPwOfMonth}, #{internetPwOfYear},#{backPwOfDay}, #{backPwOfMonth}, #{backPwOfYear}, #{limitPwOfDay}, #{limitPwOfMonth}, #{limitPwOfYear},#{limitRate}, #{errorPwOfDay}, #{errorPwOfMonth}, #{errorPwOfYear}, #{errorRate}, #{theoryPower},#{dayUserOfHour}, #{createDate}, #{plantCode})
+    </insert>
+
+    <update id="update" parameterType="com.hhgs.app.model.DO.PowerIndicator">
+       UPDATE WEBAPP_ELECTRICITY_INDEX
+       SET CURRENT_GENERATION = #{powerOfDay},MONTH_ACC_GENERATION = #{powerOfMonth},YEAR_ACC_GENERATION = #{powerOfYear},CURRENT_ON_GRID_ENERGY = #{internetPwOfDay},MONTH_ACC_ON_GRID_ENERGY= #{ internetPwOfMonth},YEAR_ACC_ON_GRID_ENERGY = #{internetPwOfYear},CURRENT_REVERSE_POWER = #{backPwOfDay}, MONTH_ACC_REVERSE_POWER = #{backPwOfMonth},YEAR_ACC_REVERSE_POWER = #{backPwOfYear},CURRENT_LIGHT_LIMIT = #{limitPwOfDay},MONTH_ACC_LIGHT_LIMIT = #{limitPwOfMonth},YEAR_ACC_LIGHT_LIMIT = #{limitPwOfYear},POWER_GRID_LIGHT_RATE = #{limitRate},CURRENT_FAULT_LIGHT_REJ = #{errorPwOfDay},MONTH_ACC_FAULT_LIGHT_REJ = #{errorPwOfMonth},YEAR_ACC_FAULT_LIGHT_REJ = #{errorPwOfYear},FAILURE_REJECTION_RATE = #{errorRate},THEORETICAL_POWER_GEN = #{theoryPower},DAILY_UTIL_HOURS = #{dayUserOfHour},CREATE_TIME = #{createDate},PLANT_CODE = #{plantCode}
+       WHERE ID=#{id}
+    </update>
+
+
+</mapper>

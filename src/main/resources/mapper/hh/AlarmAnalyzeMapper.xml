@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.AlarmAnalyzeMapper">
+
+    <sql id="common">
+        ID id,
+        PLANT_NAME plantName,
+        PLANT_TYPE plantType,
+        STATISTICS_DATE statisticsDate,
+        CREATE_DATE createDate,
+        NO_ONE_NUMBER NoOneNum,
+        SECONDARY_NUMBER secondaryNum,
+        THIRD_NUMBER thirdNum,
+        FOURTH_NUMBER fourthNum,
+        TOATL_NUMBER  totalNum
+    </sql>
+    
+    <select id="queryByConditon" resultType="com.hhgs.app.model.DO.alarm.AlarmAnalyze">
+       select <include refid="common"/> from ALARM_ANALYZE_ALL where 1=1 
+       <if test="item.plantType!=null and item.plantType!=''">
+         and PLANT_TYPE=#{item.plantType} 
+       </if> 
+       <if test="item.startTime!=null and item.endTime!=null">
+         and STATISTICS_DATE &gt;= #{item.startTime} and STATISTICS_DATE &lt;#{item.endTime}
+       </if>
+       <if test="names!=null and names.size>0">
+           and PLANT_NAME in
+           <foreach collection="names" item="name" separator="," open="(" close=")">
+              #{name}
+           </foreach>
+       </if>
+       order by STATISTICS_DATE
+    </select>
+</mapper>

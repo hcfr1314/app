@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.AlarmHistoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.hhgs.app.model.DO.alarm.AlarmHistory">
+        <id column="ORG_ID" jdbcType="VARCHAR" property="orgId"/>
+        <result column="ALARM_NAME" jdbcType="VARCHAR" property="alarmName"/>
+        <result column="DEVICE_NAME" jdbcType="VARCHAR" property="deviceName"/>
+        <result column="ALARM_CLASS" jdbcType="VARCHAR" property="alarmClass"/>
+        <result column="ALARM_TAG" jdbcType="VARCHAR" property="alarmTag"/>
+        <result column="ALARM_LEVEL" jdbcType="VARCHAR" property="alarmLevel"/>
+        <result column="PLANT_NAME" jdbcType="VARCHAR" property="plantName"/>
+        <result column="ALARM_ACTIVE" jdbcType="VARCHAR" property="alarmActive"/>
+        <result column="ACT_CH_TIME" jdbcType="TIMESTAMP" property="actChTime"/>
+        <result column="SIGN_TYPE" jdbcType="VARCHAR" property="signType"/>
+        <result column="PLANT_TYPE" jdbcType="VARCHAR" property="plantType"/>
+        <result column="ID" jdbcType="INTEGER" property="id"/>
+        <result column="ALARM_READED" jdbcType="INTEGER" property="alarmReaded"/>
+    </resultMap>
+
+   <select id="getList"  resultMap="BaseResultMap">
+     select ALARM_LEVEL,PLANT_TYPE,SIGN_TYPE,ALARM_ACTIVE,PLANT_NAME,ALARM_CLASS,DEVICE_NAME,ALARM_NAME,ORG_ID,ACT_CH_TIME,ID,ALARM_READED from ${tableName} where 1=1
+     <if test="histroy.alarmName!=null and histroy.alarmName!=''">
+       and ALARM_NAME like '%${histroy.alarmName}%' 
+     </if>
+     <if test="histroy.deviceName!=null and histroy.deviceName!=''">
+       and DEVICE_NAME like '%${histroy.deviceName}%' 
+     </if>
+     <if test="histroy.alarmClass!=null and histroy.alarmClass!=''">
+        and ALARM_CLASS =#{histroy.alarmClass}  
+     </if>
+     <if test="histroy.alarmLevel!=null and histroy.alarmLevel!=''">
+        and ALARM_LEVEL =#{histroy.alarmLevel}  
+     </if>
+     <if test="histroy.startTime!=null">
+       and ACT_CH_TIME &gt;= #{histroy.startTime}
+     </if>
+     <if test="histroy.alarmReaded!=-1">
+         and ALARM_READED = #{histroy.alarmReaded}
+     </if>
+     
+     <if test="histroy.endTime!=null">
+       and ACT_CH_TIME &lt;= #{histroy.endTime}
+     </if>
+     order by ACT_CH_TIME desc
+   </select>
+   
+    <update id="updateStatus">
+       update ${tableName} set ALARM_READED=1 where id in
+       <foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
+          #{item}
+       </foreach>
+   </update>
+
+    <select id="topTen" parameterType="string" resultMap="BaseResultMap">
+      select ALARM_LEVEL,PLANT_TYPE,SIGN_TYPE,ALARM_ACTIVE,PLANT_NAME,ALARM_CLASS,DEVICE_NAME,ALARM_NAME,ORG_ID,ACT_CH_TIME,ALARM_TAG
+      from ${tableName}
+      where id &gt;= (select max(id) from ${tableName})-100 and ALARM_ACTIVE='动作'
+      order by ACT_CH_TIME desc
+   </select>
+</mapper>

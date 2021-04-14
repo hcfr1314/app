@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.PlanPowerMapper">
+
+    <select id="queryByDateAndPlantCode" resultType="com.hhgs.app.model.DO.PlanPower">
+       select 
+         ID id,
+         SCHEDULE_CODE plantCode,
+		 STATION_ID stationId,
+		 PLAN_POWER planPw,
+		 CREAT_TIME createDate
+	   from PRESENTATION_STATION_PLAN_PW
+	   where to_char(CREAT_TIME,'yyyy-MM')=#{date} and SCHEDULE_CODE=#{plantCode}
+    </select>
+
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.StatisticsMapper">
+
+<sql id="common">
+    ID id,
+	PLANT_NAME plantName,
+	ALARM_NAME alarmName,
+	ORIGINAL_ID orginalId,
+	DEVICE_NAME deviceName,
+	ALARM_CLASS alarmClass,
+	ALARM_LEVEL alarmLevel,
+	ALARM_DATE alarmDate,
+	CREATE_DATE createDate,
+	ALARM_COUNT	alarmCount
+
+</sql>
+ 
+
+    
+    <select id="queryByConditon" parameterType="com.hhgs.app.model.DO.alarm.AnalyzeAndStatistic" resultType="com.hhgs.app.model.DO.alarm.AlarmStatistics">
+       select <include refid="common"/> from ${tableName} where 1=1
+       <if test="item.startTime!=null and item.endTime!=null">
+          and ALARM_DATE &gt;= #{item.startTime} and ALARM_DATE &lt;= #{item.endTime}
+       </if>
+    </select>
+</mapper>

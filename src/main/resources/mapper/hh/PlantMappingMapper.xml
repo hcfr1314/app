@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.PlantMappingMapper">
+
+    <sql  id="common">
+        ID id,
+        PLANT_NAME plantName,
+        TABLE_NAME_YC tableNameYC,
+        TABLE_NAME_YX tableNameYX,
+        TOPIC_NAME topicName,
+        HISTORY_TABLE_NAME historyTableName,
+        PLANT_TYPE plantType,
+        STATISTICS_TABLE_NAME statisticsTableName
+    </sql>
+
+    <select id="getAllPlantMapping" resultType="com.hhgs.app.model.DO.alarm.AlarmPlantMapping">
+        select <include refid="common"/> from ALARM_PLANT_MAPPING
+        where ID in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        ORDER BY ID
+    </select>
+
+    <select id="getByPlantName" parameterType="string" resultType="com.hhgs.app.model.DO.alarm.AlarmPlantMapping">
+        select <include refid="common"/> from ALARM_PLANT_MAPPING where PLANT_NAME=#{plantName}
+    </select>
+</mapper>

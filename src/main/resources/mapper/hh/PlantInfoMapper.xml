@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.PlantInfoMapper">
+
+    <sql id="common">
+        PLANT_CODE plantCode,
+        PLANT_NAME plantName,
+        PLANT_TYPE plantType,
+        INSTALL_CAPACITY capacity
+    </sql>
+
+    <select id="getPlantInfoList" resultType="com.hhgs.app.model.DO.PlantInfo">
+        SELECT
+          <include refid="common"/>
+        FROM
+           (
+             SELECT
+              PLANT_CODE,
+              PLANT_NAME,
+              PLANT_TYPE,
+              INSTALL_CAPACITY
+             FROM
+                DEVICEMODEL_PLANT_INFO
+            )
+         WHERE PLANT_TYPE = #{plantType}
+         <if test="list!=null and list.size!=0">
+             AND PLANT_CODE IN
+             <foreach collection="list" item="group" open=" (" separator="," close=")">
+                 #{group.groupid}
+             </foreach>
+         </if>
+    </select>
+
+    <select id="getAllList" resultType="com.hhgs.app.model.DO.PlantInfo">
+        SELECT
+            <include refid="common"/>
+        FROM
+          DEVICEMODEL_PLANT_INFO
+    </select>
+
+</mapper>

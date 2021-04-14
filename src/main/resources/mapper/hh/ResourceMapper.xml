@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.ResourceMapper">
+
+    <sql id="Irradiance">
+     INDEX_NAME indexName,
+     INDEX_VALUE indexValue,
+     CREATE_TIME createTime
+    </sql>
+
+    <sql id="CurrentIrradiation">
+       CURRENT_IRRADIATION  currentIrradiation,
+       CURRENT_SUN_HOURS currentSunHours,
+       CREATE_TIME createTime
+    </sql>
+
+
+    <select id="queryIrradiance" resultType="com.hhgs.app.model.DO.EquipmentRunning">
+        select <include refid="Irradiance"></include> from WEBAPP_EQUIPMENT_RUNNING
+        where CREATE_TIME  &gt;= #{startTime} and CREATE_TIME &lt;= #{endTime} and PLANT_CODE = #{plantCode} order By CREATE_TIME asc
+    </select>
+
+    <select id="queryIrradiationAndSunHours" resultType="com.hhgs.app.model.DO.IrradiationGeneration">
+        select <include refid="CurrentIrradiation"></include> from  WEBAPP_SOLAR_ENERGY_RESOURCE
+        where  PLANT_CODE = #{plantCode}
+        and CREATE_TIME &gt;= #{startTime} and CREATE_TIME &lt;= #{endTime} order By CREATE_TIME asc
+    </select>
+
+
+</mapper>

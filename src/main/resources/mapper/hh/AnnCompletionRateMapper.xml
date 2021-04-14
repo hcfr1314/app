@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.AnnCompletionRateMapper">
+
+    <select id="queryByPlantCodeAndCreateDate" resultType="com.hhgs.app.model.DO.AnnualCompletionRate">
+        SELECT
+         ANN_ACT_OPERATION_DAYS runningDays,
+         ANN_PLAN_POWER_GENERATION powerOfPlan,
+         ANN_PLAN_COMPLETION_RATE rateOfPlan,
+         ANN_SCHEDULE_RATIO progressRate,
+         CREATE_TIME createDate,
+         ID id,
+         PLANT_CODE plantCode
+        FROM
+          WEBAPP_ANNUAL_COMPLETION_RATE
+        WHERE
+          PLANT_CODE=#{plantCode} AND to_char(CREATE_TIME,'YYYY-MM-DD') = #{date}
+    </select>
+
+    <insert id="insert" parameterType="com.hhgs.app.model.DO.AnnualCompletionRate">
+        INSERT INTO WEBAPP_ANNUAL_COMPLETION_RATE
+           (ANN_ACT_OPERATION_DAYS, ANN_PLAN_POWER_GENERATION, ANN_PLAN_COMPLETION_RATE, ANN_SCHEDULE_RATIO, CREATE_TIME, PLANT_CODE)
+        VALUES (#{runningDays}, #{powerOfPlan}, #{rateOfPlan}, #{progressRate}, #{createDate}, #{plantCode})
+    </insert>
+
+    <update id="update" parameterType="com.hhgs.app.model.DO.AnnualCompletionRate">
+       UPDATE WEBAPP_ANNUAL_COMPLETION_RATE
+       SET ANN_ACT_OPERATION_DAYS=#{runningDays}, ANN_PLAN_POWER_GENERATION=#{powerOfPlan}, ANN_PLAN_COMPLETION_RATE=#{rateOfPlan}, ANN_SCHEDULE_RATIO=#{progressRate}, CREATE_TIME=#{createDate}, PLANT_ID=#{plantCode}
+       WHERE ID=#{id}
+    </update>
+
+</mapper>

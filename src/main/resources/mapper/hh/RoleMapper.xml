@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.RoleMapper">
+
+    <resultMap id="common" type="com.hhgs.app.model.DO.user.Role">
+            <id property="id" column="roleId"/>
+            <result property="name" column="NAME"/>
+            <result property="enName" column="EN_NAME"/>
+            <collection property="permissions" ofType="com.hhgs.app.model.DO.user.Permission">
+                <id property="id" column="pid"/>
+                <result property="url" column="URL"/>
+            </collection>
+    </resultMap>
+
+
+    <select id="loadRoleByRoleName" parameterType="string" resultMap="common">
+            SELECT
+	            R.ID roleId,R.NAME NAME,R.EN_NAME EN_NAME,
+	            P.ID pid,P.URL URL
+            FROM
+                (
+                SELECT
+                        *
+                    FROM
+                        WEBAPP_ROLE
+                    WHERE
+                        NAME = #{roleName}
+                  ) R
+            LEFT JOIN
+                 WEBAPP_ROLE_PERMISSION RP ON R.ID = RP.ROLE_ID
+            LEFT JOIN
+                 WEBAPP_PERMISSION P ON RP.PERMISSION_ID = P.ID
+    </select>
+
+
+    <insert id="saveRole" parameterType="com.hhgs.app.model.DO.user.Role">
+        insert into WEBAPP_ROLE (NAME,EN_NAME)
+        values (#{role.name},#{role.enName})
+    </insert>
+
+    <update id="editRole" parameterType="com.hhgs.app.model.DO.user.Role">
+        update WEBAPP_ROLE set
+        <trim suffixOverrides=",">
+            <if test="role.name != null or role.name != ''">
+                NAME = #{role.name},
+            </if>
+            <if test="role.enName != null or role.enName != ''">
+                EN_NAME = #{role.enName}
+            </if>
+        </trim>
+        where ID = #{role.id}
+    </update>
+
+    <select id="findAllRole" resultType="com.hhgs.app.model.DO.user.Role">
+        select * from WEBAPP_ROLE
+    </select>
+
+
+    <select id="findOtherPermissions" parameterType="java.lang.Integer" resultType="com.hhgs.app.model.DO.user.Permission">
+       select * from WEBAPP_PERMISSION where ID not in  (select PERMISSION_ID from WEBAPP_ROLE_PERMISSION where ROLE_ID = #{roleId})
+    </select>
+
+    <select id="addPermissionsToRole" parameterType="java.lang.Integer">
+        insert into WEBAPP_ROLE_PERMISSION (ROLE_ID,PERMISSION_ID) values (#{roleId},#{permissionId})
+    </select>
+
+    <delete id="deletePermissionByPermissionId">
+        delete from WEBAPP_ROLE_PERMISSION where ROLE_ID = #{roleId} and PERMISSION_ID = #{permissionId}
+    </delete>
+
+    <delete id="deleteRoleByRoleId" parameterType="java.lang.Integer">
+        delete from WEBAPP_ROLE where ID = #{roleId}
+    </delete>
+
+    <delete id="deleteRolePermissionByRoleId" parameterType="java.lang.Integer">
+        delete from WEBAPP_ROLE_PERMISSION where ROLE_ID = #{roleId}
+    </delete>
+</mapper>

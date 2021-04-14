@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhgs.app.mapper.hh.SolarEnergyMapper">
+
+    <select id="queryByPlantCodeAndCreateDate" resultType="com.hhgs.app.model.DO.SolarEnergy">
+        SELECT
+          CURRENT_IRRADIATION heOfDay,
+          MONTH_ACC_IRRADIATION heOfMonth,
+          YEAR_ACC_IRRADIATION heOfYear,
+          CURRENT_SUN_HOURS hourOfDay,
+          MONTH_ACC_SUN_HOURS hourOfMonth,
+          YEAR_ACC_SUN_HOURS hourOfYear,
+          AVG_WIND_SPEED avgWindSpeed,
+          MEAN_TEMPERATURE avgTemperature,
+          CREATE_TIME createDate,
+          ID id,
+          PLANT_CODE plantCode,
+          IRRADIANCE irradiance
+         FROM WEBAPP_SOLAR_ENERGY_RESOURCE
+         WHERE
+          PLANT_CODE=#{plantCode} AND to_char(CREATE_TIME,'YYYY-MM-DD') = #{date}
+    </select>
+
+    <insert id="insert" parameterType="com.hhgs.app.model.DO.SolarEnergy">
+        INSERT INTO WEBAPP_SOLAR_ENERGY_RESOURCE
+           (CURRENT_IRRADIATION, MONTH_ACC_IRRADIATION, YEAR_ACC_IRRADIATION, CURRENT_SUN_HOURS, MONTH_ACC_SUN_HOURS, YEAR_ACC_SUN_HOURS, AVG_WIND_SPEED, MEAN_TEMPERATURE, CREATE_TIME, PLANT_CODE, IRRADIANCE)
+           VALUES (#{heOfDay}, #{heOfMonth}, #{heOfYear}, #{hourOfDay}, #{hourOfMonth}, #{hourOfYear}, #{avgWindSpeed}, #{avgTemperature}, #{createDate}, #{plantCode}, #{irradiance})
+    </insert>
+
+    <update id="update" parameterType="com.hhgs.app.model.DO.SolarEnergy">
+       UPDATE WEBAPP_SOLAR_ENERGY_RESOURCE
+       SET CURRENT_IRRADIATION=#{heOfDay}, MONTH_ACC_IRRADIATION=#{heOfMonth}, YEAR_ACC_IRRADIATION=#{heOfYear}, CURRENT_SUN_HOURS=#{hourOfDay}, MONTH_ACC_SUN_HOURS=#{hourOfMonth}, YEAR_ACC_SUN_HOURS=#{hourOfYear}, AVG_WIND_SPEED=#{avgWindSpeed}, MEAN_TEMPERATURE=#{avgTemperature}, CREATE_TIME= #{createDate}, PLANT_CODE=#{plantCode}, IRRADIANCE= #{irradiance}
+       WHERE ID=#{id}
+    </update>
+
+
+
+
+</mapper>
